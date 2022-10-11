@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -93,28 +94,7 @@ class _SearchDialogScreenState extends State<SearchDialogScreen> {
                             }
                           },
                         ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.3,
-                          width: MediaQuery.of(context).size.width,
-                          child: _productItemList.isNotEmpty
-                              ? ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _productItemList.length,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemBuilder: (ctx, index) {
-                                    var data = _productItemList[index];
-                                    return ListTile(
-                                      title: Text(data),
-                                      leading: const CircleAvatar(
-                                        child: Icon(Icons.abc_rounded),
-                                      ),
-                                    );
-                                  },
-                                )
-                              : const Center(
-                                  child: Text('No data found.'),
-                                ),
-                        ),
+                        ProductList(productItemList: _productItemList),
                       ],
                     ),
                   );
@@ -125,6 +105,52 @@ class _SearchDialogScreenState extends State<SearchDialogScreen> {
           child: const Text("Press Button"),
         ),
       ),
+    );
+  }
+}
+
+class ProductList extends StatelessWidget {
+  const ProductList({
+    Key? key,
+    required List<String> productItemList,
+  })  : _productItemList = productItemList,
+        super(key: key);
+
+  final List<String> _productItemList;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.3,
+      width: MediaQuery.of(context).size.width,
+      child: _productItemList.isNotEmpty
+          ? AnimationLimiter(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _productItemList.length,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (ctx, index) {
+                  var data = _productItemList[index];
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 600),
+                    child: SlideAnimation(
+                      child: FadeInAnimation(
+                        child: ListTile(
+                          title: Text(data),
+                          leading: const CircleAvatar(
+                            child: Icon(Icons.abc_rounded),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          : const Center(
+              child: Text('No data found.'),
+            ),
     );
   }
 }
